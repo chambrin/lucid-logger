@@ -5,13 +5,13 @@ A structured and typed logger for Node.js/Next.js/Fastify, with clean JSON outpu
 ## Installation
 
 ```bash
-npm install @ton-org/logger
+npm instal @lucid-logger
 ```
 
 ## Quick Start
 
 ```typescript
-import { createLogger, createConsoleDestination } from '@ton-org/logger';
+import { createLogger, createConsoleDestination } from '@lucid-logger';
 
 const logger = createLogger({
   level: 'info',
@@ -168,10 +168,53 @@ logger.withLevel(level: LogLevel): Logger
 Writes to stdout (info/debug/trace) and stderr (error/fatal):
 
 ```typescript
-import { createConsoleDestination } from '@ton-org/logger';
+import { createConsoleDestination } from '@lucid-logger';
 
 const logger = createLogger({
   destinations: [createConsoleDestination()],
+});
+```
+
+### File Destination
+
+Writes JSON logs to files with optional rotation:
+
+```typescript
+import { createFileDestination } from '@lucid-logger';
+
+const logger = createLogger({
+  destinations: [
+    createFileDestination({
+      path: './logs/app.log',
+      maxSize: 10 * 1024 * 1024, // Rotate after 10MB
+      append: true, // Append to existing file (default)
+    }),
+  ],
+});
+
+// Simple usage with just a path
+const simpleLogger = createLogger({
+  destinations: [createFileDestination('./logs/simple.log')],
+});
+```
+
+When `maxSize` is reached, the file is rotated with a timestamp:
+- `app.log` → `app.log.2024-01-15T12-00-00-000Z`
+- A new `app.log` is created for fresh logs
+
+### Multiple Destinations
+
+Send logs to multiple destinations simultaneously:
+
+```typescript
+import { createLogger, createConsoleDestination, createFileDestination } from '@lucid-logger';
+
+const logger = createLogger({
+  destinations: [
+    createConsoleDestination(), // Real-time monitoring
+    createFileDestination('./logs/app.log'), // Persistent storage
+    createFileDestination('./logs/errors.log'), // Separate error logs
+  ],
 });
 ```
 
@@ -196,6 +239,29 @@ const customDestination: Destination = {
 
 See the `examples/` folder for complete use cases:
 - `examples/basic.ts` - Basic usage
+- `examples/multiple-destinations.ts` - Using multiple destinations
+- `examples/file-rotation.ts` - File rotation demo
+
+Run examples:
+```bash
+npm run example:basic
+npm run example:multi
+npm run example:rotation
+```
+
+## Performance
+
+Run benchmarks to measure performance:
+
+```bash
+npm run bench
+```
+
+Typical results (100,000 iterations):
+- **Logger overhead**: ~1.5M ops/sec
+- **With file destination**: ~730K ops/sec
+- **Level filtering**: ~26M ops/sec (filtered logs are extremely fast)
+- **Multiple destinations (3 files)**: ~371K ops/sec
 
 ## Development
 
@@ -214,6 +280,9 @@ npm run dev
 
 # Type checking
 npm run typecheck
+
+# Benchmarks
+npm run bench
 ```
 
 ## Roadmap
@@ -230,9 +299,11 @@ npm run typecheck
 - Scopes ✅
 - Redaction hook ✅
 
-### Step 3 - Multiple Destinations
-- File destination
-- Support for multiple simultaneous destinations
+### Step 3 - Multiple Destinations ✅
+- File destination ✅
+- File rotation by size ✅
+- Support for multiple simultaneous destinations ✅
+- Performance benchmarks ✅
 
 ### Step 4 - Development Mode
 - Pretty destination with colors

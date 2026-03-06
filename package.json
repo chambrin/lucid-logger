@@ -1,7 +1,7 @@
 {
-  "name": "@ton-org/logger",
+  "name": "@lucid-logger",
   "version": "0.1.0",
-  "description": "Un logger structuré et typé pour Node/Next/Fastify, avec sortie JSON propre en prod et rendu lisible en dev",
+  "description": "A structured and typed logger for Node/Next/Fastify, with clean JSON output in production and made readable in dev",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -11,7 +11,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint src/**/*.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bench": "npx tsx benchmarks/performance.ts",
+    "example:basic": "npx tsx examples/basic.ts",
+    "example:multi": "npx tsx examples/multiple-destinations.ts",
+    "example:rotation": "npx tsx examples/file-rotation.ts"
   },
   "keywords": [
     "logger",
