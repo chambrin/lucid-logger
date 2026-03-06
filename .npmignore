@@ -1,0 +1,46 @@
+# Source files (only ship dist/)
+src/
+tests/
+examples/
+benchmarks/
+
+# Config files
+tsconfig.json
+vitest.config.ts
+.eslintrc.*
+.prettierrc.*
+
+# Development
+node_modules/
+.DS_Store
+*.log
+.env
+.env.local
+coverage/
+.vitest/
+*.tsbuildinfo
+
+# Test artifacts
+test-logs/
+bench-logs/
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation source (keep only README.md)
+docs/
+CLAUDE.MD

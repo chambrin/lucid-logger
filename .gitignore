@@ -8,3 +8,12 @@ coverage/
 .vitest/
 *.tsbuildinfo
 .idea
+
+# Test artifacts
+test-logs/
+bench-logs/
+logs/
+
+# NPM
+*.tgz
+package-lock.json

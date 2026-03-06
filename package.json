@@ -1,7 +1,7 @@
 {
-  "name": "@lucid-logger",
+  "name": "lucid-logger",
   "version": "0.1.0",
-  "description": "A structured and typed logger for Node/Next/Fastify, with clean JSON output in production and made readable in dev",
+  "description": "A structured and typed logger for Node/Next/Fastify, with clean JSON output in production and readable rendering in development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -22,13 +22,28 @@
     "logging",
     "structured",
     "json",
+    "structured-logging",
     "pino",
     "winston",
     "signale",
-    "typescript"
+    "typescript",
+    "nodejs",
+    "nextjs",
+    "fastify",
+    "error-handling",
+    "log-levels",
+    "file-rotation"
   ],
-  "author": "",
+  "author": "Chambrin <contact@chambrin.dev",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chambrin/lucid-logger"
+  },
+  "homepage": "https://github.com/chambrin/lucid-logger#readme",
+  "bugs": {
+    "url": "https://github.com/chambrin/lucid-logger/issues"
+  },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
