@@ -1,6 +1,6 @@
 {
   "name": "lucid-logger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A structured and typed logger for Node/Next/Fastify, with clean JSON output in production and readable rendering in development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
