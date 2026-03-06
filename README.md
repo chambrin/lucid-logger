@@ -202,6 +202,62 @@ When `maxSize` is reached, the file is rotated with a timestamp:
 - `app.log` → `app.log.2024-01-15T12-00-00-000Z`
 - A new `app.log` is created for fresh logs
 
+### Pretty Destination (Development Mode)
+
+Human-readable output with colors and icons for development:
+
+```typescript
+import { createPrettyDestination } from 'lucid-logger';
+
+const logger = createLogger({
+  level: 'debug',
+  destinations: [createPrettyDestination()],
+});
+
+logger.info('Server started', { port: 3000 });
+// Output: [12:34:56.789] ℹ️  INFO  Server started { port=3000 }
+```
+
+**Features:**
+- 🎨 **Colorized output** by level (green for info, yellow for warn, red for error, etc.)
+- 🔍 **Icons** for each log level (ℹ️ info, ⚠️ warn, ❌ error, etc.)
+- ⏰ **Human-readable timestamps** (HH:mm:ss.SSS)
+- 📦 **Scopes** displayed in brackets with distinct colors
+- 🐛 **Stack traces** formatted with proper indentation
+- ⚙️ **Customizable** colors, icons, and formatting
+
+**Configuration:**
+
+```typescript
+createPrettyDestination({
+  colorize: true,        // Enable colors (default: true)
+  icons: true,           // Show icons (default: true)
+  timestamps: true,      // Show timestamps (default: true)
+  scopes: true,          // Show scopes (default: true)
+  customColors: {        // Override level colors
+    info: '\x1b[35m',    // Magenta for info
+  },
+  customIcons: {         // Override level icons
+    info: '✅',
+    error: '🔥',
+  },
+});
+```
+
+**Environment-based setup:**
+
+```typescript
+const isDev = process.env.NODE_ENV !== 'production';
+
+const logger = createLogger({
+  destinations: [
+    isDev
+      ? createPrettyDestination()      // Dev: colored, readable
+      : createConsoleDestination(),    // Prod: JSON
+  ],
+});
+```
+
 ### Multiple Destinations
 
 Send logs to multiple destinations simultaneously:
@@ -241,12 +297,16 @@ See the `examples/` folder for complete use cases:
 - `examples/basic.ts` - Basic usage
 - `examples/multiple-destinations.ts` - Using multiple destinations
 - `examples/file-rotation.ts` - File rotation demo
+- `examples/development-mode.ts` - Pretty output with colors
+- `examples/production-vs-dev.ts` - Environment-based configuration
 
 Run examples:
 ```bash
 npm run example:basic
 npm run example:multi
 npm run example:rotation
+npm run example:dev
+npm run example:prod-vs-dev
 ```
 
 ## Performance
@@ -305,10 +365,12 @@ npm run bench
 - Support for multiple simultaneous destinations ✅
 - Performance benchmarks ✅
 
-### Step 4 - Development Mode
-- Pretty destination with colors
-- Icons per level
-- Readable format
+### Step 4 - Development Mode ✅
+- Pretty destination with colors ✅
+- Icons per level ✅
+- Readable format ✅
+- Human-readable timestamps ✅
+- Customizable colors and icons ✅
 
 ### Step 5 - Polish
 - Redaction utilities
