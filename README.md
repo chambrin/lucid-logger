@@ -1,13 +1,6 @@
-# @ton-org/logger
+# lucid-logger
 
-Un logger structuré et typé pour Node.js/Next.js/Fastify, avec sortie JSON propre en production et rendu lisible en développement.
-
-## Vision
-
-Ce logger combine les meilleures pratiques de :
-- **Pino** : logs JSON structurés, performance, niveaux numériques
-- **Winston** : transports multiples (destinations)
-- **Signale** : scopes, sortie colorée avec icônes en développement
+A structured and typed logger for Node.js/Next.js/Fastify, with clean JSON output in production and readable rendering in development.
 
 ## Installation
 
@@ -32,11 +25,11 @@ logger.info('Server started', { port: 3000 });
 logger.error(new Error('Payment failed'), 'Transaction error', { userId: 'u_123' });
 ```
 
-## Caractéristiques
+## Features
 
-### Logs structurés JSON
+### Structured JSON Logs
 
-Chaque log produit un record JSON avec un schéma stable :
+Each log produces a JSON record with a stable schema:
 
 ```json
 {
@@ -49,31 +42,31 @@ Chaque log produit un record JSON avec un schéma stable :
 }
 ```
 
-### Niveaux de logs
+### Log Levels
 
-Six niveaux disponibles (+ `silent` pour désactiver) :
+Six levels available (+ `silent` to disable):
 - `trace` (10)
 - `debug` (20)
-- `info` (30) - niveau par défaut
+- `info` (30) - default level
 - `warn` (40)
 - `error` (50)
 - `fatal` (60)
 
-Les logs inférieurs au niveau configuré sont automatiquement filtrés pour optimiser les performances.
+Logs below the configured level are automatically filtered for optimal performance.
 
 ### Child Loggers
 
-Créez des loggers enfants avec du contexte hérité :
+Create child loggers with inherited context:
 
 ```typescript
 const requestLogger = logger.child({ requestId: 'req_abc123' });
 requestLogger.info('Processing request');
-// Inclut automatiquement requestId dans tous les logs
+// Automatically includes requestId in all logs
 ```
 
 ### Scopes
 
-Organisez vos logs par module ou fonctionnalité :
+Organize your logs by module or functionality:
 
 ```typescript
 const billingLogger = logger.scope('billing', 'stripe');
@@ -81,9 +74,9 @@ billingLogger.info('Payment processed');
 // Output: { ..., "scope": ["billing", "stripe"] }
 ```
 
-### Gestion des erreurs
+### Error Handling
 
-Sérialisez automatiquement les objets Error :
+Automatically serialize Error objects:
 
 ```typescript
 try {
@@ -93,7 +86,7 @@ try {
 }
 ```
 
-Produit :
+Output:
 
 ```json
 {
@@ -109,9 +102,9 @@ Produit :
 }
 ```
 
-### Redaction des données sensibles
+### Sensitive Data Redaction
 
-Protégez les données sensibles avec un hook de redaction :
+Protect sensitive data with a redaction hook:
 
 ```typescript
 const logger = createLogger({
@@ -128,24 +121,24 @@ const logger = createLogger({
 
 ### `createLogger(config?: LoggerConfig): Logger`
 
-Crée une instance de logger.
+Creates a logger instance.
 
-**Options de configuration :**
+**Configuration options:**
 
 ```typescript
 interface LoggerConfig {
-  level?: LogLevel;                          // Niveau minimum des logs (défaut: 'info')
-  mode?: 'production' | 'development';       // Mode d'affichage (défaut: 'production')
-  service?: string;                          // Nom du service
-  environment?: string;                      // Environnement (dev/staging/prod)
-  defaultContext?: Record<string, unknown>;  // Contexte par défaut
-  destinations?: Destination[];              // Destinations de logs
-  redact?: (record) => record;              // Hook de redaction
-  timeProvider?: () => string;               // Provider de timestamp (pour tests)
+  level?: LogLevel;                          // Minimum log level (default: 'info')
+  mode?: 'production' | 'development';       // Display mode (default: 'production')
+  service?: string;                          // Service name
+  environment?: string;                      // Environment (dev/staging/prod)
+  defaultContext?: Record<string, unknown>;  // Default context
+  destinations?: Destination[];              // Log destinations
+  redact?: (record) => record;              // Redaction hook
+  timeProvider?: () => string;               // Timestamp provider (for tests)
 }
 ```
 
-### Méthodes du Logger
+### Logger Methods
 
 ```typescript
 logger.trace(msg: string, context?: object): void
@@ -155,7 +148,7 @@ logger.warn(msg: string, context?: object): void
 logger.error(msg: string, context?: object): void
 logger.fatal(msg: string, context?: object): void
 
-// Avec Error comme premier argument
+// With Error as first argument
 logger.error(error: Error, msg?: string, context?: object): void
 
 // Child logger
@@ -164,7 +157,7 @@ logger.child(context: object): Logger
 // Scoped logger
 logger.scope(...names: string[]): Logger
 
-// Clone avec niveau différent
+// Clone with different level
 logger.withLevel(level: LogLevel): Logger
 ```
 
@@ -172,7 +165,7 @@ logger.withLevel(level: LogLevel): Logger
 
 ### Console Destination
 
-Écrit sur stdout (info/debug/trace) et stderr (error/fatal) :
+Writes to stdout (info/debug/trace) and stderr (error/fatal):
 
 ```typescript
 import { createConsoleDestination } from '@ton-org/logger';
@@ -184,7 +177,7 @@ const logger = createLogger({
 
 ### Custom Destination
 
-Créez vos propres destinations :
+Create your own destinations:
 
 ```typescript
 interface Destination {
@@ -201,13 +194,13 @@ const customDestination: Destination = {
 
 ## Examples
 
-Voir le dossier `examples/` pour des cas d'usage complets :
-- `examples/basic.ts` - Utilisation basique
+See the `examples/` folder for complete use cases:
+- `examples/basic.ts` - Basic usage
 
-## Développement
+## Development
 
 ```bash
-# Installation des dépendances
+# Install dependencies
 npm install
 
 # Build
@@ -216,7 +209,7 @@ npm run build
 # Tests
 npm test
 
-# Tests en mode watch
+# Tests in watch mode
 npm run dev
 
 # Type checking
@@ -225,34 +218,34 @@ npm run typecheck
 
 ## Roadmap
 
-### Étape 1 - Core minimal ✅
-- Mapping des niveaux
-- LogRecord de base
-- createLogger avec tous les niveaux
+### Step 1 - Minimal Core ✅
+- Level mapping
+- Basic LogRecord
+- createLogger with all levels
 - Console destination
 
-### Étape 2 - API complète (en cours)
-- Sérialisation d'erreur ✅
+### Step 2 - Complete API ✅
+- Error serialization ✅
 - Child loggers ✅
 - Scopes ✅
 - Redaction hook ✅
 
-### Étape 3 - Destinations multiples
+### Step 3 - Multiple Destinations
 - File destination
-- Support de plusieurs destinations simultanées
+- Support for multiple simultaneous destinations
 
-### Étape 4 - Mode développement
-- Pretty destination avec couleurs
-- Icônes par niveau
-- Format lisible
+### Step 4 - Development Mode
+- Pretty destination with colors
+- Icons per level
+- Readable format
 
-### Étape 5 - Polish
-- Utilitaires de redaction
-- Benchmarks de performance
+### Step 5 - Polish
+- Redaction utilities
+- Performance benchmarks
 
-### Étape 6 - Documentation et examples
-- Examples Next.js, Fastify
-- Guide d'intégration
+### Step 6 - Documentation and Examples
+- Next.js, Fastify examples
+- Integration guide
 - CI/CD
 
 ## License
