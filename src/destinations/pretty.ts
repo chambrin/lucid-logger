@@ -1,28 +1,6 @@
+import chalk from 'chalk';
 import type { Destination, LogRecord } from '../core/types.js';
 import type { LogLevel } from '../core/levels.js';
-
-// ANSI color codes
-const colors = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  dim: '\x1b[2m',
-
-  // Foreground colors
-  black: '\x1b[30m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m',
-  gray: '\x1b[90m',
-
-  // Background colors
-  bgRed: '\x1b[41m',
-  bgYellow: '\x1b[43m',
-  bgBlue: '\x1b[44m',
-} as const;
 
 // Icons for each log level
 const icons: Record<LogLevel, string> = {
@@ -35,15 +13,15 @@ const icons: Record<LogLevel, string> = {
   silent: '',
 };
 
-// Color schemes for each log level
-const levelColors: Record<LogLevel, string> = {
-  trace: colors.gray,
-  debug: colors.cyan,
-  info: colors.green,
-  warn: colors.yellow,
-  error: colors.red,
-  fatal: colors.bgRed + colors.white + colors.bold,
-  silent: colors.reset,
+// Chalk color functions for each log level
+const levelStyles: Record<LogLevel, (text: string) => string> = {
+  trace: chalk.gray,
+  debug: chalk.cyan,
+  info: chalk.green,
+  warn: chalk.yellow,
+  error: chalk.red,
+  fatal: chalk.bgRed.white.bold,
+  silent: (text: string) => text,
 };
 
 export interface PrettyDestinationConfig {
@@ -68,9 +46,9 @@ export interface PrettyDestinationConfig {
   scopes?: boolean;
 
   /**
-   * Custom color map per level
+   * Custom chalk style functions per level
    */
-  customColors?: Partial<Record<LogLevel, string>>;
+  customStyles?: Partial<Record<LogLevel, (text: string) => string>>;
 
   /**
    * Custom icons per level
@@ -94,7 +72,7 @@ function formatTimestamp(timestamp: string): string {
 /**
  * Formats context object for display
  */
-function formatContext(context: unknown): string {
+function formatContext(context: unknown, colorize: boolean): string {
   if (!context || typeof context !== 'object') {
     return '';
   }
@@ -110,11 +88,13 @@ function formatContext(context: unknown): string {
   const formatted = entries
     .map(([key, value]) => {
       const val = typeof value === 'string' ? `"${value}"` : JSON.stringify(value);
-      return `${colors.cyan}${key}${colors.reset}=${val}`;
+      const keyStr = colorize ? chalk.cyan(key) : key;
+      return `${keyStr}=${val}`;
     })
     .join(' ');
 
-  return ` ${colors.dim}{${colors.reset} ${formatted} ${colors.dim}}${colors.reset}`;
+  const braces = colorize ? chalk.dim('{}') : '{}';
+  return ` ${braces[0]} ${formatted} ${braces[1]}`;
 }
 
 /**
@@ -123,16 +103,19 @@ function formatContext(context: unknown): string {
 function formatError(error: LogRecord['error'], colorize: boolean): string {
   if (!error) return '';
 
-  const errorColor = colorize ? colors.red : '';
-  const reset = colorize ? colors.reset : '';
-  const dim = colorize ? colors.dim : '';
+  const errorText = `${error.name}: ${error.message}`;
+  const formattedError = colorize ? chalk.red(errorText) : errorText;
 
-  let result = `\n${errorColor}${error.name}: ${error.message}${reset}`;
+  let result = `\n${formattedError}`;
 
   if (error.stack) {
     // Format stack trace with indentation
     const stackLines = error.stack.split('\n').slice(1); // Skip first line (already shown)
-    result += '\n' + stackLines.map(line => `${dim}  ${line}${reset}`).join('\n');
+    const formattedStack = stackLines.map(line => {
+      const indented = `  ${line}`;
+      return colorize ? chalk.dim(indented) : indented;
+    });
+    result += '\n' + formattedStack.join('\n');
   }
 
   return result;
@@ -147,12 +130,12 @@ export function createPrettyDestination(config: PrettyDestinationConfig = {}): D
     icons: showIcons = true,
     timestamps = true,
     scopes = true,
-    customColors = {},
+    customStyles = {},
     customIcons = {},
   } = config;
 
-  // Merge custom colors and icons
-  const finalLevelColors = { ...levelColors, ...customColors };
+  // Merge custom styles and icons
+  const finalLevelStyles = { ...levelStyles, ...customStyles };
   const finalIcons = { ...icons, ...customIcons };
 
   return {
@@ -162,33 +145,31 @@ export function createPrettyDestination(config: PrettyDestinationConfig = {}): D
       // Timestamp
       if (timestamps) {
         const time = formatTimestamp(record.timestamp);
-        const timeColor = colorize ? colors.dim : '';
-        const reset = colorize ? colors.reset : '';
-        parts.push(`${timeColor}[${time}]${reset}`);
+        const formattedTime = colorize ? chalk.dim(`[${time}]`) : `[${time}]`;
+        parts.push(formattedTime);
       }
 
       // Scopes
       if (scopes && record.scope && record.scope.length > 0) {
-        const scopeColor = colorize ? colors.magenta : '';
-        const reset = colorize ? colors.reset : '';
         const scopeStr = record.scope.map(s => `[${s}]`).join('');
-        parts.push(`${scopeColor}${scopeStr}${reset}`);
+        const formattedScope = colorize ? chalk.magenta(scopeStr) : scopeStr;
+        parts.push(formattedScope);
       }
 
       // Level with icon
-      const levelColor = colorize ? finalLevelColors[record.level] : '';
-      const reset = colorize ? colors.reset : '';
       const icon = showIcons ? finalIcons[record.level] + ' ' : '';
       const levelStr = record.level.toUpperCase().padEnd(5);
-      parts.push(`${levelColor}${icon}${levelStr}${reset}`);
+      const levelText = icon + levelStr;
+      const formattedLevel = colorize ? finalLevelStyles[record.level](levelText) : levelText;
+      parts.push(formattedLevel);
 
       // Message
-      const msgColor = colorize ? colors.bold : '';
-      parts.push(`${msgColor}${record.msg}${reset}`);
+      const formattedMsg = colorize ? chalk.bold(record.msg) : record.msg;
+      parts.push(formattedMsg);
 
       // Context
       if (record.context && Object.keys(record.context).length > 0) {
-        parts.push(formatContext(record.context));
+        parts.push(formatContext(record.context, colorize));
       }
 
       // Service & Environment (if present)
@@ -200,8 +181,9 @@ export function createPrettyDestination(config: PrettyDestinationConfig = {}): D
         metadata.push(`env=${record.environment}`);
       }
       if (metadata.length > 0) {
-        const metaColor = colorize ? colors.dim : '';
-        parts.push(`${metaColor}(${metadata.join(', ')})${reset}`);
+        const metaStr = `(${metadata.join(', ')})`;
+        const formattedMeta = colorize ? chalk.dim(metaStr) : metaStr;
+        parts.push(formattedMeta);
       }
 
       // Build the log line

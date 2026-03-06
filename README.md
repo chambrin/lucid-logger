@@ -219,7 +219,7 @@ logger.info('Server started', { port: 3000 });
 ```
 
 **Features:**
-- 🎨 **Colorized output** by level (green for info, yellow for warn, red for error, etc.)
+- 🎨 **Colorized output** by level (green for info, yellow for warn, red for error, etc.) powered by [chalk](https://www.npmjs.com/package/chalk)
 - 🔍 **Icons** for each log level (ℹ️ info, ⚠️ warn, ❌ error, etc.)
 - ⏰ **Human-readable timestamps** (HH:mm:ss.SSS)
 - 📦 **Scopes** displayed in brackets with distinct colors
@@ -229,13 +229,16 @@ logger.info('Server started', { port: 3000 });
 **Configuration:**
 
 ```typescript
+import chalk from 'chalk';
+
 createPrettyDestination({
   colorize: true,        // Enable colors (default: true)
   icons: true,           // Show icons (default: true)
   timestamps: true,      // Show timestamps (default: true)
   scopes: true,          // Show scopes (default: true)
-  customColors: {        // Override level colors
-    info: '\x1b[35m',    // Magenta for info
+  customStyles: {        // Override level styles with chalk
+    info: chalk.magenta, // Use chalk functions
+    error: chalk.bold.red,
   },
   customIcons: {         // Override level icons
     info: '✅',

@@ -28,13 +28,16 @@ All notable changes to this project will be documented in this file.
 - Performance benchmarks (up to 1.5M ops/sec)
 
 ### Added - Step 4: Development Mode ✅
-- Pretty destination with colorized output
+- Pretty destination with colorized output using [chalk](https://www.npmjs.com/package/chalk)
 - Icons per log level (🔍 trace, 🐛 debug, ℹ️ info, ⚠️ warn, ❌ error, 💀 fatal)
 - Human-readable timestamps (HH:mm:ss.SSS)
 - Formatted context and scopes
 - Stack trace formatting with indentation
-- Customizable colors and icons
+- Customizable colors and icons with chalk styles
 - CI-friendly mode (no colors/icons)
+
+### Dependencies
+- `chalk` ^5.6.2 - Terminal string styling with colors
 
 ### Testing
 - 57 tests passing (100% coverage of core features)

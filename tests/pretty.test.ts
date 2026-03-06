@@ -208,9 +208,12 @@ describe('pretty destination', () => {
       expect(stderr).toContain('Error message');
     });
 
-    it('should use custom colors', () => {
+    it('should use custom styles', () => {
+      // Custom style function that wraps text in brackets
+      const customStyle = (text: string) => `[CUSTOM]${text}[/CUSTOM]`;
+
       const destination = createPrettyDestination({
-        customColors: { info: '\x1b[35m' }, // Magenta
+        customStyles: { info: customStyle },
       });
 
       const record: LogRecord = {
@@ -221,7 +224,10 @@ describe('pretty destination', () => {
 
       const { stdout } = captureOutput(() => destination.write(record));
 
-      expect(stdout).toContain('\x1b[35m'); // Magenta color code
+      // Should contain custom style markers
+      expect(stdout).toContain('[CUSTOM]');
+      expect(stdout).toContain('[/CUSTOM]');
+      expect(stdout).toContain('Custom color');
     });
 
     it('should use custom icons', () => {
