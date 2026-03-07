@@ -5,7 +5,7 @@ A structured and typed logger for Node.js/Next.js/Fastify, with clean JSON outpu
 ## Installation
 
 ```bash
-npm instal @lucid-logger
+npm instal lucid-logger
 ```
 
 ## Quick Start
