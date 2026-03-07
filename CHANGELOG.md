@@ -2,6 +2,63 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-01-20
+
+### Added - Step 5: Polish ✅
+
+#### Redaction Utilities
+- **`redactSensitiveFields()`** - Utility function to redact sensitive fields from context objects
+- **`createRedactionHook()`** - Factory function to create redaction hooks for loggers
+- **`redactByPattern()`** - Pattern-based redaction using regex
+- **`DEFAULT_SENSITIVE_FIELDS`** - Pre-configured list of common sensitive field names
+- **`REDACTION_MASK`** - Default redaction mask constant
+- Deep object traversal with nested object and array support
+- Case-insensitive field matching
+- Partial field name matching (e.g., "userPassword" matches "password")
+- 22 comprehensive tests for all redaction scenarios
+
+#### Enhanced Performance Benchmarks
+- Added redaction performance benchmarks (simple and nested)
+- Added summary table with all benchmark results
+- 10 total benchmarks covering all major features
+- Enhanced output formatting for better readability
+
+#### Documentation
+- **Graceful Shutdown Guide** (`docs/GRACEFUL_SHUTDOWN.md`)
+  - Best practices for process termination
+  - Examples for Express, Fastify, Next.js
+  - Docker and Kubernetes considerations
+  - Signal handling patterns
+- Updated README with comprehensive redaction examples
+- Added redaction example script (`examples/redaction.ts`)
+
+#### Code Quality Improvements
+- Created `.eslintrc.json` configuration
+- Fixed README typos (`npm instal` → `npm install`)
+- Fixed import paths (`@lucid-logger` → `lucid-logger`)
+- Fixed package.json author email formatting
+
+### Testing
+- 79 tests passing (up from 57)
+- 6 test suites (added redaction.test.ts)
+- New test coverage:
+  - Redaction with default fields
+  - Redaction with custom fields
+  - Nested object redaction
+  - Array redaction
+  - Case-insensitive matching
+  - Pattern-based redaction
+  - Redaction hook integration
+
+### Examples
+- Added `redaction.ts` - 8 comprehensive redaction examples
+- Added `npm run example:redaction` script
+
+### Performance
+- Redaction overhead: Minimal impact on logging performance
+- Nested redaction: Efficient deep cloning and traversal
+- All existing benchmarks maintained
+
 ## [0.1.0] - 2024-01-15
 
 ### Added - Step 1: Minimal Core ✅

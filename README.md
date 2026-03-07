@@ -5,13 +5,13 @@ A structured and typed logger for Node.js/Next.js/Fastify, with clean JSON outpu
 ## Installation
 
 ```bash
-npm instal lucid-logger
+npm install lucid-logger
 ```
 
 ## Quick Start
 
 ```typescript
-import { createLogger, createConsoleDestination } from '@lucid-logger';
+import { createLogger, createConsoleDestination } from 'lucid-logger';
 
 const logger = createLogger({
   level: 'info',
@@ -104,18 +104,51 @@ Output:
 
 ### Sensitive Data Redaction
 
-Protect sensitive data with a redaction hook:
+Protect sensitive data with built-in redaction utilities:
 
 ```typescript
+import { createLogger, createRedactionHook } from 'lucid-logger';
+
+// Use the built-in redaction hook with default sensitive fields
 const logger = createLogger({
-  redact: (record) => ({
-    ...record,
-    context: record.context
-      ? redactSensitiveFields(record.context, ['password', 'token', 'cardNumber'])
-      : undefined,
-  }),
+  redact: createRedactionHook(), // Redacts password, token, apiKey, etc.
 });
+
+logger.info('User login', {
+  userId: 'u_123',
+  password: 'secret123',  // Will be '[REDACTED]'
+  token: 'abc-def'        // Will be '[REDACTED]'
+});
+
+// Or customize the sensitive fields and mask
+const customLogger = createLogger({
+  redact: createRedactionHook(['email', 'ssn'], '***HIDDEN***'),
+});
+
+// Or use the utility function directly
+import { redactSensitiveFields, redactByPattern } from 'lucid-logger';
+
+const context = {
+  userId: 'u_123',
+  password: 'secret123',
+  cardNumber: '4532-1234-5678-9010'
+};
+
+const redacted = redactSensitiveFields(context);
+// { userId: 'u_123', password: '[REDACTED]', cardNumber: '[REDACTED]' }
+
+// Pattern-based redaction
+const patternRedacted = redactByPattern(context, /\d{4}-\d{4}-\d{4}-\d{4}/);
+// { userId: 'u_123', password: 'secret123', cardNumber: '[REDACTED]' }
 ```
+
+**Default sensitive fields:**
+- `password`, `passwd`, `pwd`
+- `secret`, `token`
+- `apiKey`, `api_key`, `accessToken`, `access_token`
+- `privateKey`, `private_key`
+- `cardNumber`, `card_number`, `cvv`
+- `ssn`, `creditCard`, `credit_card`
 
 ## API
 
@@ -266,7 +299,7 @@ const logger = createLogger({
 Send logs to multiple destinations simultaneously:
 
 ```typescript
-import { createLogger, createConsoleDestination, createFileDestination } from '@lucid-logger';
+import { createLogger, createConsoleDestination, createFileDestination } from 'lucid-logger';
 
 const logger = createLogger({
   destinations: [
@@ -302,6 +335,7 @@ See the `examples/` folder for complete use cases:
 - `examples/file-rotation.ts` - File rotation demo
 - `examples/development-mode.ts` - Pretty output with colors
 - `examples/production-vs-dev.ts` - Environment-based configuration
+- `examples/redaction.ts` - Sensitive data redaction examples
 
 Run examples:
 ```bash
@@ -310,7 +344,12 @@ npm run example:multi
 npm run example:rotation
 npm run example:dev
 npm run example:prod-vs-dev
+npm run example:redaction
 ```
+
+## Documentation
+
+- [Graceful Shutdown Guide](./docs/GRACEFUL_SHUTDOWN.md) - Best practices for handling process shutdown
 
 ## Performance
 
@@ -347,42 +386,6 @@ npm run typecheck
 # Benchmarks
 npm run bench
 ```
-
-## Roadmap
-
-### Step 1 - Minimal Core ✅
-- Level mapping
-- Basic LogRecord
-- createLogger with all levels
-- Console destination
-
-### Step 2 - Complete API ✅
-- Error serialization ✅
-- Child loggers ✅
-- Scopes ✅
-- Redaction hook ✅
-
-### Step 3 - Multiple Destinations ✅
-- File destination ✅
-- File rotation by size ✅
-- Support for multiple simultaneous destinations ✅
-- Performance benchmarks ✅
-
-### Step 4 - Development Mode ✅
-- Pretty destination with colors ✅
-- Icons per level ✅
-- Readable format ✅
-- Human-readable timestamps ✅
-- Customizable colors and icons ✅
-
-### Step 5 - Polish
-- Redaction utilities
-- Performance benchmarks
-
-### Step 6 - Documentation and Examples
-- Next.js, Fastify examples
-- Integration guide
-- CI/CD
 
 ## License
 

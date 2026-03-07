@@ -1,4 +1,9 @@
-import { createLogger, createConsoleDestination, createFileDestination } from '../src/index.js';
+import {
+  createLogger,
+  createConsoleDestination,
+  createFileDestination,
+  createRedactionHook,
+} from '../src/index.js';
 import { existsSync, rmSync } from 'node:fs';
 
 const ITERATIONS = 100_000;
@@ -124,6 +129,67 @@ const end8 = performance.now();
 const time8 = end8 - start8;
 console.log(`   Time: ${time8.toFixed(2)}ms`);
 console.log(`   Ops/sec: ${(ITERATIONS / (time8 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`);
+
+// Benchmark 9: Redaction hook
+console.log('\n9. Redaction hook (default sensitive fields):');
+const logger9 = createLogger({
+  destinations: [nullDestination],
+  redact: createRedactionHook(),
+});
+const start9 = performance.now();
+for (let i = 0; i < ITERATIONS; i++) {
+  logger9.info('Test message', {
+    iteration: i,
+    userId: 'u_123',
+    password: 'secret123',
+    token: 'abc-def',
+  });
+}
+const end9 = performance.now();
+const time9 = end9 - start9;
+console.log(`   Time: ${time9.toFixed(2)}ms`);
+console.log(`   Ops/sec: ${(ITERATIONS / (time9 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`);
+
+// Benchmark 10: Redaction with nested objects
+console.log('\n10. Redaction with nested context:');
+const logger10 = createLogger({
+  destinations: [nullDestination],
+  redact: createRedactionHook(),
+});
+const start10 = performance.now();
+for (let i = 0; i < ITERATIONS; i++) {
+  logger10.info('Test message', {
+    iteration: i,
+    user: {
+      id: 'u_123',
+      credentials: {
+        password: 'secret123',
+        apiKey: 'sk_live_abc',
+      },
+    },
+  });
+}
+const end10 = performance.now();
+const time10 = end10 - start10;
+console.log(`   Time: ${time10.toFixed(2)}ms`);
+console.log(`   Ops/sec: ${(ITERATIONS / (time10 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`);
+
+// Summary table
+console.log('\n=== Performance Summary ===');
+console.log('┌─────────────────────────────────────────────┬──────────────┬──────────────┐');
+console.log('│ Benchmark                                   │ Time (ms)    │ Ops/sec      │');
+console.log('├─────────────────────────────────────────────┼──────────────┼──────────────┤');
+console.log(`│ Logger overhead (no destinations)           │ ${time1.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time1 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Logger with null destination                │ ${time2.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time2 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Logger with file destination                │ ${time3.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time3 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Child logger with context                   │ ${time4.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time4 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Scoped logger                               │ ${time5.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time5 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Level filtering (filtered out)              │ ${time6.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time6 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Error serialization                         │ ${time7.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time7 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Multiple destinations (3 files)             │ ${time8.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time8 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Redaction hook                              │ ${time9.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time9 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log(`│ Redaction with nested context               │ ${time10.toFixed(2).padStart(12)} │ ${(ITERATIONS / (time10 / 1000)).toLocaleString(undefined, { maximumFractionDigits: 0 }).padStart(12)} │`);
+console.log('└─────────────────────────────────────────────┴──────────────┴──────────────┘');
 
 console.log('\n✓ Benchmarks completed');
 console.log(`\nNote: Benchmark logs written to ${BENCH_DIR}/`);

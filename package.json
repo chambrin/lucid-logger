@@ -1,6 +1,6 @@
 {
   "name": "lucid-logger",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A structured and typed logger for Node/Next/Fastify, with clean JSON output in production and readable rendering in development",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,8 @@
     "example:multi": "npx tsx examples/multiple-destinations.ts",
     "example:rotation": "npx tsx examples/file-rotation.ts",
     "example:dev": "npx tsx examples/development-mode.ts",
-    "example:prod-vs-dev": "npx tsx examples/production-vs-dev.ts"
+    "example:prod-vs-dev": "npx tsx examples/production-vs-dev.ts",
+    "example:redaction": "npx tsx examples/redaction.ts"
   },
   "keywords": [
     "logger",
@@ -36,7 +37,7 @@
     "log-levels",
     "file-rotation"
   ],
-  "author": "Chambrin <contact@chambrin.dev",
+  "author": "Chambrin <contact@chambrin.dev>",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -9,3 +9,12 @@ export { createFileDestination } from './destinations/file.js';
 export type { FileDestinationConfig } from './destinations/file.js';
 export { createPrettyDestination } from './destinations/pretty.js';
 export type { PrettyDestinationConfig } from './destinations/pretty.js';
+
+// Utilities
+export {
+  redactSensitiveFields,
+  createRedactionHook,
+  redactByPattern,
+  DEFAULT_SENSITIVE_FIELDS,
+  REDACTION_MASK,
+} from './utils/redaction.js';
